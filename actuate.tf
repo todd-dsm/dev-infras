@@ -18,10 +18,11 @@ module "network" {
 # -----------------------------------------------------------------------------
 # Quick Demos & Sanity Checks
 # -----------------------------------------------------------------------------
-#module "tester" {
-#  source       = "./mods/test"
-#  vpc_network  = module.apps_cluster.vpc_id
-#  dns_zone     = var.dns_zone
-#  builder      = var.builder
-#  officeIPAddr = var.officeIPAddr
-#}
+module "compute" {
+  source       = "./mods/compute"
+  vpc_network  = module.network.vpc_id
+  subnet       = module.network.subnet_ids[0]
+  dns_zone     = var.dns_zone
+  builder      = var.builder
+  officeIPAddr = var.officeIPAddr
+}
