@@ -1,0 +1,25 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> ${awsProviderVersion}"
+    }
+  }
+  backend "s3" {
+    dynamodb_table = "${stateLockDynamoDB}"
+    bucket         = "${TF_VAR_stateBucket}"
+    key            = "${myComponent}/${TF_VAR_envBuild}"
+    region         = "${TF_VAR_region}"
+    encrypt        = true
+    //role_arn = "arn:aws:iam::${TF_VAR_aws_acct_no}:role/terraform-backend"
+  }
+}
+
+provider "aws" {
+  default_tags {
+    tags = {
+      env     = var.envBuild
+      project = var.project
+    }
+  }
+}

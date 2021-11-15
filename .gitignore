@@ -1,0 +1,17 @@
+#  IntelliJ IDEA
+**/.idea/*
+#  Local .terraform directories
+**/.terraform/*
+**/.terraform.lock.hcl
+backend.hcl
+provider-aws.tf
+# .tfstate files
+transaction.yaml
+**.csr
+**.pem
+*.tfstate
+*.tfstate.*
+**nohup.out
+.archive/*
+ztuff/*
+
