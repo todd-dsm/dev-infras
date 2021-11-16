@@ -20,6 +20,9 @@ apply:	## Build Terraform project with output log
 		-input=false 2>&1 | \
 		tee /tmp/tf-$(TF_VAR_myProject)-apply.out
 
+addr:   ## Retrieve the public_ip address from the Instance
+	terraform state show module.compute.aws_instance.test_instance | grep 'public_ip' | grep -v associate_public_ip_address
+
 state:	## View the Terraform State File in VS-Code
 	@scripts/view-tf-state.sh
 
