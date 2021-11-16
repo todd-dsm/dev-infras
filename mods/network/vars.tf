@@ -36,11 +36,6 @@ variable "minDistSize" {
   type        = number
 }
 
-variable "twoOctets" {
-  default = "The first 2 octets of our CIDR block; E.G.: 10.172 of 10.172.0.0/16"
-  type    = string
-}
-
 variable "host_cidr" {
   description = "CIDR block reserved for networking; E.G.: 10.172.0.0/16"
   type        = string

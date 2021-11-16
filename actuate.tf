@@ -6,7 +6,6 @@ module "network" {
   host_cidr   = var.host_cidr
   minDistSize = var.minDistSize
   envBuild    = var.envBuild
-  twoOctets   = var.twoOctets
   myCo        = var.myCo
   project     = var.project
   region      = var.region

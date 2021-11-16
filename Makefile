@@ -2,7 +2,6 @@
 # vim: tabstop=8 noexpandtab
 
 # Grab some ENV stuff
-filePlan		?= $(shell $(filePlan))
 TF_VAR_myProject	?= $(shell $(TF_VAR_myProject))
 
 # Start Terraforming
@@ -12,15 +11,17 @@ tf-init: ## Initialze the build
 	terraform init -get=true -backend=true -reconfigure
 
 plan:	## Initialze and Plan the build with output log
-	terraform fmt -recursive=true
-	terraform plan -no-color \
-		-out=$(filePlan) 2>&1 | \
+	terraform fmt  -recursive=true
+	terraform plan -no-color 2>&1 | \
 		tee /tmp/tf-$(TF_VAR_myProject)-plan.out
 
 apply:	## Build Terraform project with output log
 	terraform apply --auto-approve -no-color \
-		-input=false "$(filePlan)" 2>&1 | \
+		-input=false 2>&1 | \
 		tee /tmp/tf-$(TF_VAR_myProject)-apply.out
+
+state:	## View the Terraform State File in VS-Code
+	@scripts/view-tf-state.sh
 
 clean:	## Clean WARNING Message
 	@echo ""
@@ -35,7 +36,8 @@ clean:	## Clean WARNING Message
 
 clean-all:	## Destroy Terraformed resources and all generated files with output log
 	terraform apply -destroy -auto-approve -no-color 2>&1 | \
-		tee /tmp/tf-$(TF_VAR_myProject)-destroy.out
+	 	tee /tmp/tf-$(TF_VAR_myProject)-destroy.out
+	@scripts/reset-demo.sh
 	rm -f "$(filePlan)"
 	rm -rf .terraform/ .terraform.lock.hcl
 

@@ -8,8 +8,17 @@ There are a few, important pregame steps:
 * [awscli] 
   * macOS: `brew install awscli`
   * Ubuntu: `sudo apt-get update && sudo apt-get install awscli`
+* [keybase] - used to cryptographically validate the Terraform package
+  * macOS: `brew install --cask keybase`
+  * Install it, open it and configure it. 
+  * **Leave `keybase` running during the Terraform install**
 * [Terraform]
   * via `tfenv`; `brew install tfenv` [quickstart]
+* [IntelliJ] Community Edition
+  * macOS: `brew install intellij-idea-ce`
+    * install the Terraform plugin
+    * Preferences > Plugins > Search: [Terraform and HCL]
+    * Install this plugin and restart IntelliJ
 * [helm] 3.x
   * macOS: `brew install kubernetes-helm`
   * [Debian/Ubuntu]
@@ -120,6 +129,8 @@ You should now be clear to build.
 [native package management]:https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-using-native-package-management
 [ktx]:https://github.com/heptiolabs/ktx
 [Linux-install]:https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html
+[keybase]:https://keybase.io/docs/the_app/install_macos
+[Terraform and HCL]:https://plugins.jetbrains.com/plugin/7808-terraform-and-hcl
 [helm]:https://helm.sh/docs/intro/install/#from-homebrew-macos
 [Debian/Ubuntu]:https://helm.sh/docs/intro/install/#from-apt-debianubuntu
 [Terraform]:https://www.hashicorp.com/blog/announcing-hashicorp-homebrew-tap
