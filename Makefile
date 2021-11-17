@@ -40,7 +40,7 @@ clean:	## Clean WARNING Message
 clean-all:	## Destroy Terraformed resources and all generated files with output log
 	terraform apply -destroy -auto-approve -no-color 2>&1 | \
 	 	tee /tmp/tf-$(TF_VAR_myProject)-destroy.out
-	@scripts/reset-demo.sh
+	#@scripts/reset-demo.sh
 	rm -f "$(filePlan)"
 	rm -rf .terraform/ .terraform.lock.hcl
 
