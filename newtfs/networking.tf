@@ -38,6 +38,7 @@ resource "aws_subnet" "vpc_network" {
   tags = {
     Name                               = var.project
     "kubernetes.io/cluster/my-cluster" = "shared"
+    "mySubnet"                         = "fancy"
   }
 }
 
