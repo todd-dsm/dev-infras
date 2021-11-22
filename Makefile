@@ -3,6 +3,7 @@
 
 # Grab some ENV stuff
 TF_VAR_myProject	?= $(shell $(TF_VAR_myProject))
+TF_VAR_envBuild 	?= $(shell $(TF_VAR_envBuild))
 
 # Start Terraforming
 all:	tf-init plan apply
@@ -40,9 +41,9 @@ clean:	## Clean WARNING Message
 clean-all:	## Destroy Terraformed resources and all generated files with output log
 	terraform apply -destroy -auto-approve -no-color 2>&1 | \
 	 	tee /tmp/tf-$(TF_VAR_myProject)-destroy.out
-	@scripts/reset-demo.sh
 	rm -f "$(filePlan)"
 	rm -rf .terraform/ .terraform.lock.hcl
+	@scripts/reset-demo.sh
 
 #-----------------------------------------------------------------------------#
 #------------------------   MANAGERIAL OVERHEAD   ----------------------------#
