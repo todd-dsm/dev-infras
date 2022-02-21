@@ -96,7 +96,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.62.0"
+      version = "~> 3.72.0"       # Minimum for IPv6 EKS Clusters
     }
   }
   backend "s3" {
@@ -112,8 +112,9 @@ terraform {
 provider "aws" {
   default_tags {
     tags = {
-      env     = var.envBuild
-      project = var.project
+      env            = var.envBuild
+      project        = var.project
+      DATADOG_FILTER = "UUID-GOES-HERE"
     }
   }
 }
