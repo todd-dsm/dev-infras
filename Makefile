@@ -43,7 +43,6 @@ clean-all:	## Destroy Terraformed resources and all generated files with output 
 	 	tee /tmp/tf-$(TF_VAR_myProject)-destroy.out
 	rm -f "$(filePlan)"
 	rm -rf .terraform/ .terraform.lock.hcl
-	@scripts/reset-demo.sh
 
 #-----------------------------------------------------------------------------#
 #------------------------   MANAGERIAL OVERHEAD   ----------------------------#
