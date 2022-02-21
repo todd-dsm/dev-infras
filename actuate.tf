@@ -18,7 +18,7 @@ module "network" {
 # Quick Demos & Sanity Checks
 # -----------------------------------------------------------------------------
 #module "compute" {
-#  source       = "./mods/compute"
+#  source       = "./mods/infras"
 #  vpc_network  = module.network.vpc_id
 #  subnet       = module.network.subnet_ids[0]
 #  dns_zone     = var.dns_zone
