@@ -131,6 +131,7 @@ You should now be clear to build.
 [Linux-install]:https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html
 [keybase]:https://keybase.io/docs/the_app/install_macos
 [Terraform and HCL]:https://plugins.jetbrains.com/plugin/7808-terraform-and-hcl
+[IntelliJ]:https://www.jetbrains.com/idea/
 [helm]:https://helm.sh/docs/intro/install/#from-homebrew-macos
 [Debian/Ubuntu]:https://helm.sh/docs/intro/install/#from-apt-debianubuntu
 [Terraform]:https://www.hashicorp.com/blog/announcing-hashicorp-homebrew-tap
