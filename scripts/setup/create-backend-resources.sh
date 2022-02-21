@@ -55,7 +55,7 @@ echo "Region set to: $TF_VAR_region"
 ###---
 ### Setup Terraform state storage and locking
 ###---
-#tableExist="$(aws dynamodb describe-table --table-name "$stateLockDynamoDB" 2>/dev/null)"
+tableExist="$(aws dynamodb describe-table --table-name "$stateLockDynamoDB" 2>/dev/null)"
 if [[ -n "$tableExist" ]]; then
     pMsg "  We already have DynamoDB Table: $stateLockDynamoDB"
 else
