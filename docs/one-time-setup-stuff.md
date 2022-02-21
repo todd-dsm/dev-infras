@@ -27,7 +27,10 @@ There are a few, important pregame steps:
 
 _NOTE: It's not necessary to purchase a domain but your experimentation will produce better results if you do._ Register a domain in AWS - _ONLY_, then create a public zone and record these details in `build.env`
 
-3 - Source-in build variables:
+
+3- Always check your build variables; on a new job use a later version of the [AWS Provider].
+
+4 - Source-in build variables:
 
 `source build.env <stage|prod>`; E.G.:
 
@@ -138,3 +141,4 @@ You should now be clear to build.
 [Terraform]:https://www.hashicorp.com/blog/announcing-hashicorp-homebrew-tap
 [quickstart]:https://gist.github.com/todd-dsm/1dc120506e89ec36d4d9a05ccb93f68c
 [one-time setup steps]:https://github.com/taosmountain/infras-eks/blob/main/docs/one-time-setup-stuff.md
+[AWS Provider]:https://github.com/hashicorp/terraform-provider-aws/releases
