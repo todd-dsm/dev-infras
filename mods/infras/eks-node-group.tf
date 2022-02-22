@@ -68,7 +68,7 @@ resource "aws_launch_template" "launch_template_apps" {
   ---------------------------------------------------------|------------------------------------------------------------
 */
 resource "aws_iam_role" "apps_node_group" {
-  name = "apps-node-group"
+  name = "apps-node-group-${var.envBuild}"
 
   assume_role_policy = jsonencode({
     Statement = [{

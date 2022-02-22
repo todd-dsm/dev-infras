@@ -8,7 +8,7 @@
   ---------------------------------------------------------|------------------------------------------------------------
 */
 resource "aws_iam_policy" "lb_controller_nodes" {
-  name        = "aws-lb-controller-policy"
+  name        = "aws-lb-controller-${var.envBuild}"
   path        = "/"
   description = "The AWS Load Balancer Controller manages AWS Elastic Load Balancers for a Kubernetes cluster."
 
