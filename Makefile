@@ -12,7 +12,7 @@ tf-init: ## Initialze the build
 	terraform init -get=true -backend=true -reconfigure
 
 plan:	## Initialze and Plan the build with output log
-	terraform fmt  -recursive=true
+	terraform fmt -recursive=true
 	terraform plan -no-color 2>&1 | \
 		tee /tmp/tf-$(TF_VAR_myProject)-plan.out
 

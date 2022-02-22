@@ -5,6 +5,16 @@
 #  value = module.network.subnet_ids
 #}
 
-#output "compute_subnet_id" {
-#  value = module.network.subnet_ids[0]
+
+# TEMP TESTS; DELETE LATER
+#output "network_subnet_ids" {
+#  value = module.network.subnet_ids
+#}
+#
+#output "network_vpc_id" {
+#  value = module.network.vpc_id
+#}
+#
+#output "network_vpc_arn" {
+#  value = module.network.vpc_arn
 #}
