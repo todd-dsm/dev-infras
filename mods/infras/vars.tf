@@ -58,8 +58,3 @@ variable "maxDistSize" {
   description = "ENV Integer; max count of distributed EKS workers; E.G.: export TF_VAR_minDistSize=12"
   type        = number
 }
-
-variable "DATADOG_UUID" {
-  description = "Preferably a v4 UUID; E.G.: cb3600cb-23bc-4d05-b841-6825e7a3daf5"
-  type        = string
-}

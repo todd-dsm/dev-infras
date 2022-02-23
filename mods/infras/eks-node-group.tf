@@ -57,7 +57,7 @@ resource "aws_launch_template" "launch_template_apps" {
   tag_specifications {
     resource_type = "instance"
     tags = {
-      "DATADOG_FILTER" = var.DATADOG_UUID
+      DATADOG_FILTER = random_uuid.datadog_uuid.id
     }
   }
 }

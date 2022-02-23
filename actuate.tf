@@ -8,7 +8,6 @@ module "clusters" {
   officeIPAddr  = var.officeIPAddr
   minDistSize   = var.minDistSize
   maxDistSize   = var.maxDistSize
-  DATADOG_UUID  = var.DATADOG_UUID
   project       = var.project
   kubeNode_type = var.kubeNode_type
   envBuild      = var.envBuild
