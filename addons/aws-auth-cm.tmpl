@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-auth
+  namespace: kube-system
+data:
+  mapRoles: |
+    - rolearn: arn:aws:iam::${TF_VAR_aws_acct_no}:role/apps-node-group
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+        - system:bootstrappers
+        - system:nodes
+    - rolearn: arn:aws:iam::${TF_VAR_aws_acct_no}:role/Codesuite-Pipeline-example
+      username: admin
+      groups:
+        - system:masters
+  mapUsers: |
+    - userarn: arn:aws:iam::${TF_VAR_aws_acct_no}:user/thomas
+      username: thomas
+      groups:
+        - system:masters
+    - userarn: arn:aws:iam::${TF_VAR_aws_acct_no}:user/ericsteen
+      username: ericsteen
+      groups:
+        - system:masters
+    - userarn: arn:aws:iam::${TF_VAR_aws_acct_no}:user/joel
+      username: joel
+      groups:
+        - system:masters

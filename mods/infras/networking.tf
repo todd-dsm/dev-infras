@@ -13,6 +13,7 @@ resource "aws_vpc" "vpc_network" {
   tags = {
     Name                               = var.project
     "kubernetes.io/cluster/my-cluster" = "shared"
+    DATADOG_FILTER                     = random_uuid.datadog_uuid.id
   }
 }
 

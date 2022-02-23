@@ -40,7 +40,7 @@ resource "aws_eks_node_group" "apps" {
     #env                                                  = var.envBuild
     #project                                              = var.project
     "kubernetes.io/cluster/${aws_eks_cluster.apps.name}" = var.project
-    DATADOG_FILTER = random_uuid.datadog_uuid.id
+    DATADOG_FILTER                                       = random_uuid.datadog_uuid.id
   }
 }
 
@@ -159,7 +159,7 @@ resource "aws_security_group" "apps_nodes" {
 
   tags = {
     "kubernetes.io/cluster/${var.cluster_apps}" = "owned"
-    DATADOG_FILTER = random_uuid.datadog_uuid.id
+    DATADOG_FILTER                              = random_uuid.datadog_uuid.id
   }
 }
 
