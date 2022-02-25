@@ -11,9 +11,9 @@ resource "aws_vpc" "vpc_network" {
   assign_generated_ipv6_cidr_block = true # Assigns a /56 block of IPv6 IPs to the VPC
 
   tags = {
-    Name                               = var.project
-    "kubernetes.io/cluster/my-cluster" = "shared"
-    DATADOG_FILTER                     = random_uuid.datadog_uuid.id
+    Name                                        = var.project
+    "kubernetes.io/cluster/${var.cluster_apps}" = "shared"
+    DATADOG_FILTER                              = random_uuid.datadog_uuid.id
   }
 }
 
@@ -36,10 +36,10 @@ resource "aws_subnet" "vpc_network" {
   ipv6_cidr_block = cidrsubnet(aws_vpc.vpc_network.ipv6_cidr_block, 8, count.index)
 
   tags = {
-    Name                               = var.project
-    "kubernetes.io/cluster/my-cluster" = "shared"
-    "mySubnet"                         = "fancy"
-    DATADOG_FILTER                     = random_uuid.datadog_uuid.id
+    Name                                        = var.project
+    "kubernetes.io/cluster/${var.cluster_apps}" = "shared"
+    "mySubnet"                                  = "fancy"
+    DATADOG_FILTER                              = random_uuid.datadog_uuid.id
   }
 }
 
@@ -49,9 +49,9 @@ resource "aws_internet_gateway" "vpc_network" {
   vpc_id = aws_vpc.vpc_network.id
 
   tags = {
-    Name                               = var.project
-    "kubernetes.io/cluster/my-cluster" = "shared"
-    DATADOG_FILTER                     = random_uuid.datadog_uuid.id
+    Name                                        = var.project
+    "kubernetes.io/cluster/${var.cluster_apps}" = "shared"
+    DATADOG_FILTER                              = random_uuid.datadog_uuid.id
   }
 }
 
@@ -71,9 +71,9 @@ resource "aws_route_table" "vpc_network" {
   }
 
   tags = {
-    Name                               = var.project
-    "kubernetes.io/cluster/my-cluster" = "shared"
-    DATADOG_FILTER                     = random_uuid.datadog_uuid.id
+    Name                                        = var.project
+    "kubernetes.io/cluster/${var.cluster_apps}" = "shared"
+    DATADOG_FILTER                              = random_uuid.datadog_uuid.id
   }
 }
 
