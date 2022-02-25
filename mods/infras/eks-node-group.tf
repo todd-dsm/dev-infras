@@ -55,7 +55,7 @@ data "aws_launch_template" "launch_template_apps" {
 }
 
 resource "aws_launch_template" "launch_template_apps" {
-  name = "launch-template-node-group-${var.envBuild}"
+  name = "lt-${var.cluster_apps}-mng"
   tag_specifications {
     resource_type = "instance"
     tags = {
