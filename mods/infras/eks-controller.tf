@@ -66,7 +66,8 @@ resource "aws_iam_role" "apps_cluster" {
 }
 POLICY
   tags = {
-    Name = var.cluster_apps
+    Name           = var.cluster_apps
+    DATADOG_FILTER = random_uuid.datadog_uuid.id
   }
 }
 
@@ -137,6 +138,7 @@ resource "aws_security_group" "apps_cluster" {
   tags = {
     Name                                        = var.cluster_apps
     "kubernetes.io/cluster/${var.cluster_apps}" = "shared"
+    DATADOG_FILTER                              = random_uuid.datadog_uuid.id
   }
 }
 

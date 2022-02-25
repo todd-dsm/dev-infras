@@ -39,6 +39,7 @@ resource "aws_subnet" "vpc_network" {
     Name                               = var.project
     "kubernetes.io/cluster/my-cluster" = "shared"
     "mySubnet"                         = "fancy"
+    DATADOG_FILTER                     = random_uuid.datadog_uuid.id
   }
 }
 
@@ -50,6 +51,7 @@ resource "aws_internet_gateway" "vpc_network" {
   tags = {
     Name                               = var.project
     "kubernetes.io/cluster/my-cluster" = "shared"
+    DATADOG_FILTER                     = random_uuid.datadog_uuid.id
   }
 }
 
@@ -71,6 +73,7 @@ resource "aws_route_table" "vpc_network" {
   tags = {
     Name                               = var.project
     "kubernetes.io/cluster/my-cluster" = "shared"
+    DATADOG_FILTER                     = random_uuid.datadog_uuid.id
   }
 }
 
@@ -96,6 +99,10 @@ resource "aws_flow_log" "vpc_network_flow_logs" {
 
 resource "aws_cloudwatch_log_group" "vpc_network_flow_logs" {
   name = "vpc_network_flow_${var.envBuild}_logs"
+
+  tags = {
+    DATADOG_FILTER = random_uuid.datadog_uuid.id
+  }
 }
 
 resource "aws_iam_role" "vpc_network_flow_logs_role" {
@@ -116,6 +123,10 @@ resource "aws_iam_role" "vpc_network_flow_logs_role" {
   ]
 }
 EOF
+
+  tags = {
+    DATADOG_FILTER = random_uuid.datadog_uuid.id
+  }
 }
 
 resource "aws_iam_role_policy" "vpc_network_flow_logs_policy" {
