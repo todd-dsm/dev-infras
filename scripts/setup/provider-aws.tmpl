@@ -20,7 +20,6 @@ provider "aws" {
     tags = {
       env            = var.envBuild
       project        = var.project
-      DATADOG_FILTER = "UUID-GOES-HERE"
     }
   }
 }
