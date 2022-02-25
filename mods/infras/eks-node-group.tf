@@ -36,9 +36,6 @@ resource "aws_eks_node_group" "apps" {
   ]
 
   tags = {
-    #Name                                                 = var.cluster_apps
-    #env                                                  = var.envBuild
-    #project                                              = var.project
     "kubernetes.io/cluster/${aws_eks_cluster.apps.name}" = var.project
     DATADOG_FILTER                                       = random_uuid.datadog_uuid.id
   }
@@ -56,6 +53,7 @@ data "aws_launch_template" "launch_template_apps" {
 
 resource "aws_launch_template" "launch_template_apps" {
   name = "lt-${var.cluster_apps}-mng"
+
   tag_specifications {
     resource_type = "instance"
     tags = {
