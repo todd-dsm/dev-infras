@@ -30,6 +30,10 @@ resource "aws_eks_cluster" "apps" {
     aws_iam_role_policy_attachment.apps_cluster-AmazonEKSVPCResourceControllerPolicy,
     aws_iam_role_policy_attachment.cluster_elb_sl_role_creation,
   ]
+
+  tags = {
+    DATADOG_FILTER = random_uuid.datadog_uuid.id
+  }
 }
 
 # Setup controller logging

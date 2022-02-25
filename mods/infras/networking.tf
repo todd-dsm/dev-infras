@@ -38,7 +38,6 @@ resource "aws_subnet" "vpc_network" {
   tags = {
     Name                                        = var.project
     "kubernetes.io/cluster/${var.cluster_apps}" = "shared"
-    "mySubnet"                                  = "fancy"
     DATADOG_FILTER                              = random_uuid.datadog_uuid.id
   }
 }
