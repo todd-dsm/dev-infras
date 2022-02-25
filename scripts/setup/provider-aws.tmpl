@@ -11,7 +11,6 @@ terraform {
     key            = "${myComponent}/${TF_VAR_envBuild}"
     region         = "${TF_VAR_region}"
     encrypt        = true
-    //role_arn = "arn:aws:iam::${TF_VAR_aws_acct_no}:role/terraform-backend"
   }
 }
 
