@@ -55,6 +55,7 @@ data "aws_launch_template" "launch_template_apps" {
 }
 
 resource "aws_launch_template" "launch_template_apps" {
+  name = "launch-template-node-group-${var.envBuild}"
   tag_specifications {
     resource_type = "instance"
     tags = {
@@ -81,7 +82,12 @@ resource "aws_iam_role" "apps_node_group" {
     }]
     Version = "2012-10-17"
   })
+
+  tags = {
+    DATADOG_FILTER = random_uuid.datadog_uuid.id
+  }
 }
+
 
 resource "aws_iam_role_policy_attachment" "apps_nodes_AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
