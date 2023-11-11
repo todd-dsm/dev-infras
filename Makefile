@@ -8,7 +8,7 @@ TF_VAR_envBuild 	?= $(shell $(TF_VAR_envBuild))
 # Start Terraforming
 all:	tf-init plan apply
 
-tf-init: ## Initialze the build
+init:	## Initialze the build
 	terraform init -get=true -backend=true -reconfigure
 
 plan:	## Initialze and Plan the build with output log

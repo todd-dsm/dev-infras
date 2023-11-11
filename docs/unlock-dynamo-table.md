@@ -14,7 +14,7 @@ Error message: ConditionalCheckFailedException: The conditional request
 failed
 Lock Info:
   ID:        2068c5a0-aec0-b5fd-d7ed-00ac184795db
-  Path:      tf-state-taos-terraform-demo-west/env/stage
+  Path:      tf-state-gitops-demo-stage/env/stage
   Operation: OperationTypePlan
   Who:       userName@hostName
   Version:   1.0.9
@@ -32,8 +32,8 @@ flag, but this is not recommended.
 terraform {
 ...
   backend "s3" {
-    dynamodb_table = "tf-state-taos-terraform-demo-west-lock" <- tableName
-    bucket         = "tf-state-taos-terraform-demo-west"
+    dynamodb_table = "tf-state-gitops-demo-stage-lock" <- tableName
+    bucket         = "tf-state-gitops-demo-stage"
     key            = "env/stage"                       <- keyName
     region         = "us-west-2"
 ...

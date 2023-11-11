@@ -52,7 +52,7 @@ Region set to: us-west-2
                 "AttributeType": "S"
             }
         ],
-        "TableName": "tf-state-taos-terraform-demo-west-lock",
+        "TableName": "tf-state-gitops-demo-stage-lock",
         "KeySchema": [
             {
                 "AttributeName": "LockID",
@@ -68,7 +68,7 @@ Region set to: us-west-2
         },
         "TableSizeBytes": 0,
         "ItemCount": 0,
-        "TableArn": "arn:aws:dynamodb:us-west-2:299285526804:table/tf-state-taos-terraform-demo-west-lock",
+        "TableArn": "arn:aws:dynamodb:us-west-2:299285526804:table/tf-state-gitops-demo-stage-lock",
         "TableId": "f0c35dea-f26e-463e-8c39-e293bffb87db",
         "SSEDescription": {
             "Status": "ENABLED",
@@ -80,8 +80,8 @@ Region set to: us-west-2
 
 
 Creating a bucket for remote terraform state...
-make_bucket: tf-state-taos-terraform-demo-west
-  The bucket has been created: tf-state-taos-terraform-demo-west
+make_bucket: tf-state-gitops-demo-stage
+  The bucket has been created: tf-state-gitops-demo-stage
   Enabling versioning...
   Enabling encryption...
   Blocking public access...
@@ -103,8 +103,8 @@ terraform {
     }
   }
   backend "s3" {
-    dynamodb_table = "tf-state-taos-terraform-demo-west-lock"
-    bucket         = "tf-state-taos-terraform-demo-west"
+    dynamodb_table = "tf-state-gitops-demo-stage-lock"
+    bucket         = "tf-state-gitops-demo-stage"
     key            = "terraform/stage"
     region         = "us-west-2"
     encrypt        = true
@@ -140,5 +140,5 @@ You should now be clear to build.
 [Debian/Ubuntu]:https://helm.sh/docs/intro/install/#from-apt-debianubuntu
 [Terraform]:https://www.hashicorp.com/blog/announcing-hashicorp-homebrew-tap
 [quickstart]:https://gist.github.com/todd-dsm/1dc120506e89ec36d4d9a05ccb93f68c
-[one-time setup steps]:https://github.com/taosmountain/infras-eks/blob/main/docs/one-time-setup-stuff.md
+[one-time setup steps]:https://github.com/todd-dsm/infras-eks/blob/main/docs/one-time-setup-stuff.md
 [AWS Provider]:https://github.com/hashicorp/terraform-provider-aws/releases
