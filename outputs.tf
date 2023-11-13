@@ -1,6 +1,14 @@
 /*
                               Top-Level Outputs; Good for TESTING
 */
+#output "partition" {
+#  value = var.part
+#}
+#
+#output "module_policy_arn" {
+#  value = module.clusters.module_policy_arn
+#}
+
 #output "subnet_ids" {
 #  value = module.network.subnet_ids
 #}

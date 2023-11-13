@@ -3,6 +3,8 @@
                                                     NETWORKING
   -------------------------------------------------------|--------------------------------------------------------------
 */
+# AWS: https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html
+# HTF: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc
 resource "aws_vpc" "vpc_network" {
   cidr_block           = var.host_cidr # a.b.c.d/16
   enable_dns_hostnames = true
@@ -11,12 +13,16 @@ resource "aws_vpc" "vpc_network" {
   assign_generated_ipv6_cidr_block = true # Assigns a /56 block of IPv6 IPs to the VPC
 
   tags = {
-    Name                               = var.project
-    "kubernetes.io/cluster/my-cluster" = "shared"
+    Name        = var.project
+    environment = var.envBuild
   }
 }
 
-# Create Subnets within the VPC
+# ----------------------------------------------------------------------------------------------------------------------
+# REQ: Create Subnets within the VPC
+# AWS: https://docs.aws.amazon.com/eks/latest/userguide/network_reqs.html#network-requirements-subnets
+# HTF: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet
+# ----------------------------------------------------------------------------------------------------------------------
 # n = count = var.minDistSize (needs to be </= 4)
 # REQ: Create n number of /18 IPv4 subnets
 # REQ: Create n number of /64 IPv6 subnets
@@ -35,25 +41,32 @@ resource "aws_subnet" "vpc_network" {
   ipv6_cidr_block = cidrsubnet(aws_vpc.vpc_network.ipv6_cidr_block, 8, count.index)
 
   tags = {
-    Name                               = var.project
-    "kubernetes.io/cluster/my-cluster" = "shared"
-    "mySubnet"                         = "fancy"
+    Name                     = var.project
+    "kubernetes.io/role/elb" = 1
+    "Type"                   = "Public"
   }
 }
 
-# REQ: Create an Internet Gateway we can make outbound calls
-# REF: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway
+# ----------------------------------------------------------------------------------------------------------------------
+# REQ: Create an Internet Gateway to enable outbound calls.
+#       * There appear to be no further tagging requirements for this resource.
+#       * This is what make the above subnets PUBLIC.
+# AWS: https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html
+# HTF: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway
+# ----------------------------------------------------------------------------------------------------------------------
 resource "aws_internet_gateway" "vpc_network" {
   vpc_id = aws_vpc.vpc_network.id
 
   tags = {
-    Name                               = var.project
-    "kubernetes.io/cluster/my-cluster" = "shared"
+    Name = var.project
   }
 }
 
+# ----------------------------------------------------------------------------------------------------------------------
 # REQ: Create a Route Table with routs, one-each: IPv4 and IPv6
+# AWS: https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Route_Tables.html
 # REF: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table
+# ----------------------------------------------------------------------------------------------------------------------
 resource "aws_route_table" "vpc_network" {
   vpc_id = aws_vpc.vpc_network.id
 
@@ -68,79 +81,92 @@ resource "aws_route_table" "vpc_network" {
   }
 
   tags = {
-    Name                               = var.project
-    "kubernetes.io/cluster/my-cluster" = "shared"
+    Name   = var.project
+    "Type" = "Public"
   }
 }
 
+# ----------------------------------------------------------------------------------------------------------------------
 # Associate all subnets with the above Routes
-# REF: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association
+# AWS: https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Route_Tables.html
+# HTF: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association
+# ----------------------------------------------------------------------------------------------------------------------
 resource "aws_route_table_association" "vpc_network" {
   count          = length(aws_subnet.vpc_network)
   subnet_id      = aws_subnet.vpc_network[count.index].id
   route_table_id = aws_route_table.vpc_network.id
 }
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Enable VPC Flow Logs
+# AWS: https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs-cwl.html
+# HTF: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/flow_log
+# HTF: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document
+# ----------------------------------------------------------------------------------------------------------------------
 /*
   -------------------------------------------------------|--------------------------------------------------------------
                                                     VPC Flow Logs
   -------------------------------------------------------|--------------------------------------------------------------
 */
-resource "aws_flow_log" "vpc_network_flow_logs" {
-  vpc_id          = aws_vpc.vpc_network.id
+# Create the destination log group
+resource "aws_cloudwatch_log_group" "flow_logs_primary" {
+  name = var.project
+}
+
+# Authorize logging to elevate permissions
+data "aws_iam_policy_document" "flow_logs_assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["vpc-flow-logs.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+# Create a role for the flow logs and attache the above policy
+resource "aws_iam_role" "flow_logs_role_primary" {
+  name               = "flow-logs-assume-role-${var.project}"
+  assume_role_policy = data.aws_iam_policy_document.flow_logs_assume_role.json
+}
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Create a policy that allows flow logs to write to cloud watch
+data "aws_iam_policy_document" "cloudwatch_logging_primary" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:DescribeLogGroups",
+      "logs:DescribeLogStreams",
+    ]
+
+    resources = ["*"]
+  }
+}
+
+# Tie the cloudwatch_logging_primary policy to the flow-logs-assume-role
+resource "aws_iam_role_policy" "cw_logging_role" {
+  name   = "cloudwatch-logging-${var.project}"
+  role   = aws_iam_role.flow_logs_role_primary.id
+  policy = data.aws_iam_policy_document.cloudwatch_logging_primary.json
+}
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+# Configure the VPC Flow Logs
+resource "aws_flow_log" "vpc_flow_logs_primary" {
+  iam_role_arn    = aws_iam_role.flow_logs_role_primary.arn
+  log_destination = aws_cloudwatch_log_group.flow_logs_primary.arn
   traffic_type    = "ALL"
-  iam_role_arn    = aws_iam_role.vpc_network_flow_logs_role.arn
-  log_destination = aws_cloudwatch_log_group.vpc_network_flow_logs.arn
+  vpc_id          = aws_vpc.vpc_network.id
 }
-
-resource "aws_cloudwatch_log_group" "vpc_network_flow_logs" {
-  name = "vpc_network_flow_${var.envBuild}_logs"
-}
-
-resource "aws_iam_role" "vpc_network_flow_logs_role" {
-  name = "vpc_network_flow_logs_${var.envBuild}_role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "",
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "vpc-flow-logs.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy" "vpc_network_flow_logs_policy" {
-  name = "vpc_network_flow_logs_${var.envBuild}_policy"
-  role = aws_iam_role.vpc_network_flow_logs_role.id
-
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents",
-        "logs:DescribeLogGroups",
-        "logs:DescribeLogStreams"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    }
-  ]
-}
-EOF
-}
-
 
 /*
   -------------------------------------------------------|--------------------------------------------------------------

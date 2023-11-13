@@ -4,8 +4,6 @@
 module "clusters" {
   source        = "./mods/infras"
   dns_zone      = var.dns_zone
-  builder       = var.builder
-  officeIPAddr  = var.officeIPAddr
   minDistSize   = var.minDistSize
   maxDistSize   = var.maxDistSize
   DATADOG_UUID  = var.DATADOG_UUID
@@ -14,7 +12,21 @@ module "clusters" {
   envBuild      = var.envBuild
   cluster_apps  = var.cluster_apps
   host_cidr     = var.host_cidr
+  officeIPAddr  = var.officeIPAddr
+  part          = local.part
+  builder       = local.builder
 }
+
+# -----------------------------------------------------------------------------
+# Testing: vpc config for quick tf testing
+# -----------------------------------------------------------------------------
+#module "testing" {
+#  source    = "./mods/testing"
+#  host_cidr = var.host_cidr
+#  project   = var.project
+#  part      = local.part
+#  builder   = var.builder
+#}
 
 # -----------------------------------------------------------------------------
 # Networking: Project-level

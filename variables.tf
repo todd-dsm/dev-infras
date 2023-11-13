@@ -44,7 +44,7 @@ variable "host_cidr" {
 }
 
 variable "builder" {
-  description = "Evaluates to $USER; there must be key-pair (with the same name) in EC2 prior to apply."
+  description = "IAM user account of the calling Builder; E.G.: tthomas"
   type        = string
 }
 

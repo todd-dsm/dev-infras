@@ -19,6 +19,11 @@ variable "project" {
   type        = string
 }
 
+variable "part" {
+  description = "Disco partition for reuse Commercial, GovCloud, or China."
+  type        = string
+}
+
 variable "officeIPAddr" {
   description = "IP address of current gateway"
   type        = string
