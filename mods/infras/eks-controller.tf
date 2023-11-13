@@ -28,15 +28,38 @@ resource "aws_eks_cluster" "apps" {
     aws_iam_role_policy_attachment.apps_cluster-AmazonEKSClusterPolicy,
     aws_iam_role_policy_attachment.apps_cluster-AmazonEKSServicePolicy,
     aws_iam_role_policy_attachment.apps_cluster-AmazonEKSVPCResourceControllerPolicy,
-    aws_iam_role_policy_attachment.cluster_elb_sl_role_creation,
+    #aws_iam_role_policy_attachment.cluster_elb_sl_role_creation,
   ]
+  tags = {
+    "eks:cluster-name" = var.cluster_apps
+  }
 }
 
-# Setup controller logging
+/*
+  ---------------------------------------------------------|------------------------------------------------------------
+                                                      EKS Logging
+  AWS: https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html
+  HTF: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group
+  HTF: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_cluster#enabling-control-plane-logging
+  ---------------------------------------------------------|------------------------------------------------------------
+*/
 resource "aws_cloudwatch_log_group" "apps" {
   name              = "/aws/eks/${var.cluster_apps}/cluster"
-  retention_in_days = 30
+  retention_in_days = 7
 }
+
+/*
+  ---------------------------------------------------------|------------------------------------------------------------
+                                                   Amazon EKS Addons
+  ---------------------------------------------------------|------------------------------------------------------------
+*/
+
+#resource "aws_eks_addon" "example" {
+#  cluster_name                = aws_eks_cluster.apps.name
+#  addon_name                  = "coredns"
+#  addon_version               = "v1.10.1-eksbuild.1" #e.g., previous version v1.9.3-eksbuild.3 and the new version is v1.10.1-eksbuild.1
+#  resolve_conflicts_on_update = "PRESERVE"
+#}
 
 /*
   ---------------------------------------------------------|------------------------------------------------------------
@@ -45,26 +68,25 @@ resource "aws_cloudwatch_log_group" "apps" {
 */
 # Create IAM Role for the EKS Cluster
 # REF: https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html
-resource "aws_iam_role" "apps_cluster" {
-  name = "${var.cluster_apps}-cluster"
+data "aws_iam_policy_document" "apps_cluster_policy" {
+  statement {
+    effect = "Allow"
 
-  assume_role_policy = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": [
-          "eks.amazonaws.com",
-          "ec2.amazonaws.com"
-         ]
-      },
-      "Action": "sts:AssumeRole"
+    principals {
+      type = "Service"
+      identifiers = [
+        "eks.amazonaws.com",
+        "ec2.amazonaws.com" # do I still need this?
+      ]
     }
-  ]
+
+    actions = ["sts:AssumeRole"]
+  }
 }
-POLICY
+
+resource "aws_iam_role" "apps_cluster" {
+  name               = var.cluster_apps
+  assume_role_policy = data.aws_iam_policy_document.apps_cluster_policy.json
   tags = {
     Name = var.cluster_apps
   }
@@ -90,31 +112,36 @@ resource "aws_iam_role_policy_attachment" "apps_cluster-AmazonEKSVPCResourceCont
 }
 
 /*
- Adding a policy for cluster IAM role to allow permissions required to create
- AWSServiceRoleForElasticLoadBalancing service-linked role by EKS during ELB provisioning
+  ---------------------------------------------------------|------------------------------------------------------------
+                                             AWS Load Balancer Controller
+
+  SIG: https://kubernetes-sigs.github.io/aws-load-balancer-controller
+  Prerequisites:
+    * amazon-vpc-cni-k8s https://github.com/aws/amazon-vpc-cni-k8s#readme
+  ---------------------------------------------------------|------------------------------------------------------------
 */
-data "aws_iam_policy_document" "cluster_elb_sl_role_creation" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "ec2:DescribeAccountAttributes",
-      "ec2:DescribeAddresses",
-      "ec2:DescribeInternetGateways"
-    ]
-    resources = ["*"]
-  }
-}
-
-resource "aws_iam_policy" "cluster_elb_sl_role_creation" {
-  name_prefix = "${var.cluster_apps}-elb-sl-role-creation"
-  description = "Permissions for EKS to create AWSServiceRoleForElasticLoadBalancing service-linked role"
-  policy      = data.aws_iam_policy_document.cluster_elb_sl_role_creation.json
-}
-
-resource "aws_iam_role_policy_attachment" "cluster_elb_sl_role_creation" {
-  policy_arn = aws_iam_policy.cluster_elb_sl_role_creation.arn
-  role       = aws_iam_role.apps_cluster.name
-}
+#data "aws_iam_policy_document" "cluster_elb_sl_role_creation" {
+#  statement {
+#    effect = "Allow"
+#    actions = [
+#      "ec2:DescribeAccountAttributes",
+#      "ec2:DescribeAddresses",
+#      "ec2:DescribeInternetGateways"
+#    ]
+#    resources = ["*"]
+#  }
+#}
+#
+#resource "aws_iam_policy" "cluster_elb_sl_role_creation" {
+#  name_prefix = "${var.cluster_apps}-elb-sl-role-creation"
+#  description = "Permissions for EKS to create AWSServiceRoleForElasticLoadBalancing service-linked role"
+#  policy      = data.aws_iam_policy_document.cluster_elb_sl_role_creation.json
+#}
+#
+#resource "aws_iam_role_policy_attachment" "cluster_elb_sl_role_creation" {
+#  policy_arn = aws_iam_policy.cluster_elb_sl_role_creation.arn
+#  role       = aws_iam_role.apps_cluster.name
+#}
 
 /*
   ---------------------------------------------------------|------------------------------------------------------------
@@ -192,3 +219,5 @@ resource "aws_security_group" "apps_cluster" {
 #}
 #EOF
 #}
+
+

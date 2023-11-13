@@ -1,14 +1,16 @@
 /*
   ---------------------------------------------------------|------------------------------------------------------------
-                                                Amazon EKS Node Group
+                                                 EKS Managed Node Group
+  AWS: https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html
+  HTF: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_node_group
   ---------------------------------------------------------|------------------------------------------------------------
 */
 resource "aws_eks_node_group" "apps" {
   cluster_name    = aws_eks_cluster.apps.name
   node_group_name = aws_eks_cluster.apps.name
-  instance_types  = [var.kubeNode_type]
   node_role_arn   = aws_iam_role.apps_node_group.arn
   subnet_ids      = aws_subnet.vpc_network[*].id
+  instance_types  = [var.kubeNode_type]
 
   scaling_config {
     desired_size = var.minDistSize
@@ -21,7 +23,7 @@ resource "aws_eks_node_group" "apps" {
     version = data.aws_launch_template.launch_template_apps.latest_version
   }
 
-  # Ignore desired_size in the case of scaling changes - and redness
+  # The ASG WILL scale the node groups; desired_size should be ignored after launch
   lifecycle {
     ignore_changes = [scaling_config[0].desired_size]
   }
@@ -29,17 +31,21 @@ resource "aws_eks_node_group" "apps" {
   # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
   # Otherwise, EKS will not be able to properly delete EC2 Instances and Elastic Network Interfaces.
   depends_on = [
-    aws_iam_role_policy_attachment.apps_nodes_AmazonEKSWorkerNodePolicy,
-    aws_iam_role_policy_attachment.apps_nodes_AmazonEKS_CNI_Policy,
-    aws_iam_role_policy_attachment.apps_nodes_AmazonEC2ContainerRegistryReadOnly,
+    aws_iam_role_policy_attachment.apps_nodes-AmazonEKSWorkerNodePolicy,
+    aws_iam_role_policy_attachment.apps_nodes-AmazonEKS_CNI_Policy,
+    aws_iam_role_policy_attachment.apps_nodes-AmazonEC2ContainerRegistryReadOnly,
     data.aws_launch_template.launch_template_apps,
   ]
 
+  # Percentage of nodes that can be UNAVAILABLE during upgrades
+  update_config {
+    max_unavailable_percentage = 50
+  }
+
   tags = {
-    #Name                                                 = var.cluster_apps
-    #env                                                  = var.envBuild
-    #project                                              = var.project
-    "kubernetes.io/cluster/${aws_eks_cluster.apps.name}" = var.project
+    env                = var.envBuild
+    project            = var.project
+    "eks:cluster-name" = var.cluster_apps
   }
 }
 
@@ -57,7 +63,8 @@ resource "aws_launch_template" "launch_template_apps" {
   tag_specifications {
     resource_type = "instance"
     tags = {
-      "DATADOG_FILTER" = var.DATADOG_UUID
+      "eks:cluster-name" = var.cluster_apps
+      "DATADOG_FILTER"   = var.DATADOG_UUID
     }
   }
 }
@@ -82,31 +89,35 @@ resource "aws_iam_role" "apps_node_group" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "apps_nodes_AmazonEKSWorkerNodePolicy" {
+#output "module_policy_arn" {
+#  value = aws_iam_role_policy_attachment.apps_nodes-AmazonEKSWorkerNodePolicy.policy_arn
+#}
+
+resource "aws_iam_role_policy_attachment" "apps_nodes-AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
   role       = aws_iam_role.apps_node_group.name
 }
 
-resource "aws_iam_role_policy_attachment" "apps_nodes_AmazonEKS_CNI_Policy" {
+resource "aws_iam_role_policy_attachment" "apps_nodes-AmazonEKS_CNI_Policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
   role       = aws_iam_role.apps_node_group.name
 }
 
-resource "aws_iam_role_policy_attachment" "apps_nodes_AmazonEC2ContainerRegistryReadOnly" {
+resource "aws_iam_role_policy_attachment" "apps_nodes-AmazonEC2ContainerRegistryReadOnly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   role       = aws_iam_role.apps_node_group.name
 }
 
-# Attach AWS Load Balancer Controller policy to the managed node group
-resource "aws_iam_role_policy_attachment" "lb_controller_nodes_apps" {
-  policy_arn = aws_iam_policy.lb_controller_nodes.arn
-  role       = aws_iam_role.apps_node_group.name
-}
+## Attach AWS Load Balancer Controller policy to the managed node group
+#resource "aws_iam_role_policy_attachment" "lb_controller_nodes_apps" {
+#  policy_arn = aws_iam_policy.lb_controller_nodes.arn
+#  role       = aws_iam_role.apps_node_group.name
+#}
 
 /*
   ---------------------------------------------------------|------------------------------------------------------------
                                                        KMS Policy
-                                 Authorizes the nodes to reach out for the Vault KMS key.                               
+                                 Authorizes the nodes to reach out for the Vault KMS key.
   ---------------------------------------------------------|------------------------------------------------------------
 */
 #data "aws_iam_policy_document" "kms_use_policy_document" {
@@ -189,10 +200,10 @@ resource "aws_security_group_rule" "apps_nodes_ingress_cluster" {
 */
 data "aws_route53_zone" "apps_nodes_xdns_zone" {
   name         = var.dns_zone
-  private_zone = true
+  private_zone = false
 }
 
-resource "aws_iam_role_policy_attachment" "apps_nodes_worker_node_xdns_policy" {
+resource "aws_iam_role_policy_attachment" "apps_nodes-xdns_policy" {
   policy_arn = aws_iam_policy.apps_nodes_external_dns_policy.arn
   role       = aws_iam_role.apps_node_group.name
 }
@@ -236,7 +247,7 @@ EOF
                 REF: https://github.com/aws/amazon-vpc-cni-k8s/blob/master/docs/iam-policy.md#ipv6-mode
   ---------------------------------------------------------|------------------------------------------------------------
 */
-resource "aws_iam_role_policy_attachment" "apps-nodes-worker_node_cni_ipv6_policy" {
+resource "aws_iam_role_policy_attachment" "apps_nodes-cni_ipv6_policy" {
   policy_arn = aws_iam_policy.apps_nodes_cni_ipv6.arn
   role       = aws_iam_role.apps_node_group.name
 }
