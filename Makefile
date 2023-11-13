@@ -4,22 +4,26 @@
 # Grab some ENV stuff
 TF_VAR_myProject	?= $(shell $(TF_VAR_myProject))
 TF_VAR_envBuild 	?= $(shell $(TF_VAR_envBuild))
+TF_VAR_filePlan 	?= $(shell $(TF_VAR_filePlan))
 
 # Start Terraforming
-all:	tf-init plan apply
+all:	init plan apply creds
 
 init:	## Initialze the build
 	terraform init -get=true -backend=true -reconfigure
 
 plan:	## Initialze and Plan the build with output log
 	terraform fmt -recursive=true
-	terraform plan -no-color 2>&1 | \
-		tee /tmp/tf-$(TF_VAR_myProject)-plan.out
+	terraform plan -no-color -out=$(filePlan) \
+		2>&1 | tee /tmp/tf-$(TF_VAR_myProject)-plan.out
 
 apply:	## Build Terraform project with output log
-	terraform apply --auto-approve -no-color \
-		-input=false 2>&1 | \
-		tee /tmp/tf-$(TF_VAR_myProject)-apply.out
+	terraform apply --auto-approve -no-color -parallelism=1 \
+		-input=false $(filePlan) \
+		2>&1 | tee /tmp/tf-$(TF_VAR_myProject)-apply.out
+
+creds:	## Retrieve the public_ip address from the Instance
+	@addons/eks/get-creds.sh
 
 addr:	## Retrieve the public_ip address from the Instance
 	terraform state show module.compute.aws_instance.test_instance | grep 'public_ip' | grep -v associate_public_ip_address
