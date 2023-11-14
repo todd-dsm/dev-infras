@@ -28,7 +28,7 @@ data "aws_partition" "found" {}
 */
 locals {
   part    = data.aws_partition.found.partition
-  builder = regex("arn:aws:iam::\\d+:user/(.*)", data.aws_caller_identity.current.arn)[0]
+  builder = regex("arn:${local.part}:iam::\\d+:user/(.*)", data.aws_caller_identity.current.arn)[0]
 }
 
 output "partition" {
