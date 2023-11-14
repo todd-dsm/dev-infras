@@ -1,0 +1,62 @@
+# https://kubedb.com/docs/v2023.10.9/guides/postgres/quickstart/quickstart/#install-pgadmin
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: $kubeDdNs
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: pgadmin
+  name: pgadmin
+  namespace: $kubeDdNs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgadmin
+  template:
+    metadata:
+      labels:
+        app: pgadmin
+    spec:
+      containers:
+      - image: dpage/pgadmin4:latest
+        imagePullPolicy: Always
+        name: pgadmin
+        env:
+        - name: PGADMIN_DEFAULT_EMAIL
+          value: "$emailID"
+        - name: PGADMIN_DEFAULT_PASSWORD
+          value: "admin"
+        - name: PGADMIN_PORT
+          value: "80"
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        resources:
+          requests:
+            cpu: ".5"
+            memory: 256Mi
+          limits:
+            cpu: "1"
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: pgadmin
+  name: pgadmin
+  namespace: $kubeDdNs
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app: pgadmin
+  type: LoadBalancer

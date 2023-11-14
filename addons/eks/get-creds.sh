@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# shellcheck disable=SC2034,SC2154
+# shellcheck disable=SC2034,SC2154,SC2317,SC1091,SC2155
 # ------------------------------------------------------------------------------
 #  PURPOSE:       *** FOR USE WHEN YOU DIDN'T BUILD THE CLUSTER ***
 #           Load all kubeconfigs for the current environment from running:
@@ -28,13 +28,14 @@
 ###-----------------------------------------------------------------------------
 ### VARIABLES
 ###-----------------------------------------------------------------------------
+export awsPart="$(terraform output -raw partition)"
 : "${TF_VAR_envBuild?       No environment defined}"
 : "${TF_VAR_project?        No project defined}"
 : "${TF_VAR_region?         No region defined}"
-: "${TF_VAR_aws_acct_no?    No zone defined}"
+: "${TF_VAR_aws_acct_no?    No account_id defined}"
+: "${awsPart?               No partition defined}"
 
 # ENV Stuff
-kubeConfDir="$HOME/.kube"
 targetCluster="${TF_VAR_myProject}-${TF_VAR_envBuild}"
 verbose=0
 
@@ -207,7 +208,8 @@ while IFS=$'\t' read -r junk foundCluster; do
     # verify a context of the same name isn't already configured
     [[ $foundCluster != "$targetCluster" ]] && continue
     export foundCluster="$foundCluster"
-    ktxFile="${kubeConfDir}/${foundCluster}.ktx"
+    ktxFile="${KUBECONFIG_DIR}/${foundCluster}.ktx"
+    export KUBECONFIG="$ktxFile"
     if [[ -e "$ktxFile" ]]; then
         rm -f "$ktxFile"
         getKubeConfig "$TF_VAR_region" "$foundCluster"
@@ -216,20 +218,20 @@ while IFS=$'\t' read -r junk foundCluster; do
     fi
     # Change those obnoxious names
     renameCreds \
-        "arn:aws:eks:${TF_VAR_region}:${TF_VAR_aws_acct_no}:cluster/${foundCluster}" \
+        "arn:${awsPart}:eks:${TF_VAR_region}:${TF_VAR_aws_acct_no}:cluster/${foundCluster}" \
             "$foundCluster"
 done < <(aws eks list-clusters --region="$TF_VAR_region" --output text)
 #set +x
 
 
 ###---
-### REQ
+### Make the announcement
 ###---
-
-
-###---
-### REQ
-###---
+if ! kubectl cluster-info; then
+    pMsgS "uh-o, better see whats wrong"
+else
+    pMsgS "its Alive!"
+fi
 
 
 ###---

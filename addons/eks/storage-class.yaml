@@ -1,0 +1,26 @@
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: standard
+provisioner: ebs.csi.aws.com
+parameters:
+  type: gp2
+  encrypted: 'true'
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Delete
+mountOptions:
+  - debug
+
+# ----------------------------------------------------------------------------
+# Requirements:
+#   * Amazon EBS CSI driver: ebs.csi.aws.com
+#   * Use gp3 unless it becomes a PITA
+#   * Always encrypt EBS volumes by default
+# NOTE:
+#   * EBS volumes are AZ specific
+# FIXME:
+#   1) Parameterize this file: cat to EOF: namespace, volume Type, etc.
+#   2) Rename to something more appropriate; E.G. "pgsql-gp3"
+# REF: https://kubernetes.io/docs/concepts/storage/storage-classes/
+# ----------------------------------------------------------------------------
