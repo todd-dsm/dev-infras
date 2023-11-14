@@ -33,10 +33,10 @@ variable "cluster_apps" {
   type        = string
 }
 
-variable "myDomain" {
-  description = "Root DNS Zone for myCo; I.E.: example.tld; minus the trailing dot"
-  type        = string
-}
+#variable "domain" {
+#  description = "Root DNS Zone for myCo; I.E.: example.tld; minus the trailing dot"
+#  type        = string
+#}
 
 variable "host_cidr" {
   description = "CIDR block reserved for networking; E.G.: 10.172.0.0/16"
@@ -45,11 +45,6 @@ variable "host_cidr" {
 
 variable "zone_private" {
   description = "The zone is either private (true) or it's public (false)."
-  type        = string
-}
-
-variable "builder" {
-  description = "IAM user account of the calling Builder; E.G.: tthomas"
   type        = string
 }
 

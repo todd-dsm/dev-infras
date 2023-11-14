@@ -26,10 +26,10 @@ variable "dns_zone" {
   type        = string
 }
 
-variable "myDomain" {
-  description = "Root DNS Zone for myCo; I.E.: example.tld; minus the trailing dot"
-  type        = string
-}
+#variable "domain" {
+#  description = "Root DNS Zone for myCo; I.E.: example.tld; minus the trailing dot"
+#  type        = string
+#}
 
 variable "minDistSize" {
   description = "ENV Integer; initial count of distributed subnets, workers, etc; E.G.: export TF_VAR_minDistSize=3"

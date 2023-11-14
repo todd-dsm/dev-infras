@@ -42,5 +42,4 @@ module "clusters" {
 #  region      = var.region
 #  dns_zone    = var.dns_zone
 #  builder     = var.builder
-#  myDomain    = var.myDomain
 #}

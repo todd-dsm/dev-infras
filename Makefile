@@ -7,7 +7,7 @@ TF_VAR_envBuild 	?= $(shell $(TF_VAR_envBuild))
 TF_VAR_filePlan 	?= $(shell $(TF_VAR_filePlan))
 
 # Start Terraforming
-all:	init plan apply creds
+all:	init plan apply creds 
 
 init:	## Initialze the build
 	terraform init -get=true -backend=true -reconfigure
@@ -24,6 +24,18 @@ apply:	## Build Terraform project with output log
 
 creds:	## Retrieve the public_ip address from the Instance
 	@addons/eks/get-creds.sh
+
+ekscfg: ## Additional Cluster Configurations
+	#@addons/eks/add-cluster-configs.sh
+
+divr:   ## ---------------------- 'make all' ends here ------------------------ 
+
+data:   ## Install KubeDB to support locally managed DATA
+	@addons/kubedb/kubedb-inst.sh
+	@addons/kubedb/demo-config.sh
+
+rmdb:   ## Install KubeDB to support locally managed DATA
+	@addons/kubedb/kubedb-remove.sh
 
 addr:	## Retrieve the public_ip address from the Instance
 	terraform state show module.compute.aws_instance.test_instance | grep 'public_ip' | grep -v associate_public_ip_address
