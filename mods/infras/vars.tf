@@ -39,6 +39,11 @@ variable "host_cidr" {
   type        = string
 }
 
+variable "zone_private" {
+  description = "The zone is either private (true) or it's public (false)."
+  type        = string
+}
+
 variable "builder" {
   description = "builder of the things"
   type        = string

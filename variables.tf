@@ -43,6 +43,11 @@ variable "host_cidr" {
   type        = string
 }
 
+variable "zone_private" {
+  description = "The zone is either private (true) or it's public (false)."
+  type        = string
+}
+
 variable "builder" {
   description = "IAM user account of the calling Builder; E.G.: tthomas"
   type        = string

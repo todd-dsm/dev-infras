@@ -12,6 +12,7 @@ module "clusters" {
   envBuild      = var.envBuild
   cluster_apps  = var.cluster_apps
   host_cidr     = var.host_cidr
+  zone_private  = var.zone_private
   officeIPAddr  = var.officeIPAddr
   part          = local.part
   builder       = local.builder

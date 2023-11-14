@@ -94,17 +94,17 @@ resource "aws_iam_role" "apps_node_group" {
 #}
 
 resource "aws_iam_role_policy_attachment" "apps_nodes-AmazonEKSWorkerNodePolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  policy_arn = "arn:${var.part}:iam::aws:policy/AmazonEKSWorkerNodePolicy"
   role       = aws_iam_role.apps_node_group.name
 }
 
 resource "aws_iam_role_policy_attachment" "apps_nodes-AmazonEKS_CNI_Policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  policy_arn = "arn:${var.part}:iam::aws:policy/AmazonEKS_CNI_Policy"
   role       = aws_iam_role.apps_node_group.name
 }
 
 resource "aws_iam_role_policy_attachment" "apps_nodes-AmazonEC2ContainerRegistryReadOnly" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  policy_arn = "arn:${var.part}:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   role       = aws_iam_role.apps_node_group.name
 }
 
@@ -200,7 +200,7 @@ resource "aws_security_group_rule" "apps_nodes_ingress_cluster" {
 */
 data "aws_route53_zone" "apps_nodes_xdns_zone" {
   name         = var.dns_zone
-  private_zone = false
+  private_zone = var.zone_private
 }
 
 resource "aws_iam_role_policy_attachment" "apps_nodes-xdns_policy" {
@@ -223,7 +223,7 @@ resource "aws_iam_policy" "apps_nodes_external_dns_policy" {
         "route53:ChangeResourceRecordSets"
       ],
       "Resource": [
-        "arn:aws:route53:::hostedzone/*"
+        "arn:${var.part}:route53:::hostedzone/*"
       ]
     },
     {
@@ -276,7 +276,7 @@ resource "aws_iam_policy" "apps_nodes_cni_ipv6" {
             "Action": [
                 "ec2:CreateTags"
             ],
-            "Resource": "arn:aws:ec2:*:*:network-interface/*",
+            "Resource": "arn:${var.part}:ec2:*:*:network-interface/*",
             "Effect": "Allow"
         }
    ]
