@@ -156,7 +156,7 @@ resource "aws_iam_role_policy_attachment" "apps_nodes-AmazonEC2ContainerRegistry
 */
 # This security group controls networking access to the Kubernetes worker nodes.
 resource "aws_security_group" "apps_nodes" {
-  name        = "apps-node"
+  name        = "apps-nodes"
   description = "Security group for all nodes in the cluster"
   vpc_id      = aws_vpc.vpc_network.id
 
