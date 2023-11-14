@@ -103,7 +103,7 @@
 #            "Action": [
 #                "ec2:CreateTags"
 #            ],
-#            "Resource": "arn:aws:ec2:*:*:security-group/*",
+#            "Resource": "arn:${var.part}:ec2:*:*:security-group/*",
 #            "Condition": {
 #                "StringEquals": {
 #                    "ec2:CreateAction": "CreateSecurityGroup"
@@ -119,7 +119,7 @@
 #                "ec2:CreateTags",
 #                "ec2:DeleteTags"
 #            ],
-#            "Resource": "arn:aws:ec2:*:*:security-group/*",
+#            "Resource": "arn:${var.part}:ec2:*:*:security-group/*",
 #            "Condition": {
 #                "Null": {
 #                    "aws:RequestTag/elbv2.k8s.aws/cluster": "true",
@@ -171,9 +171,9 @@
 #                "elasticloadbalancing:RemoveTags"
 #            ],
 #            "Resource": [
-#                "arn:aws:elasticloadbalancing:*:*:targetgroup/*/*",
-#                "arn:aws:elasticloadbalancing:*:*:loadbalancer/net/*/*",
-#                "arn:aws:elasticloadbalancing:*:*:loadbalancer/app/*/*"
+#                "arn:${var.part}:elasticloadbalancing:*:*:targetgroup/*/*",
+#                "arn:${var.part}:elasticloadbalancing:*:*:loadbalancer/net/*/*",
+#                "arn:${var.part}:elasticloadbalancing:*:*:loadbalancer/app/*/*"
 #            ],
 #            "Condition": {
 #                "Null": {
@@ -189,10 +189,10 @@
 #                "elasticloadbalancing:RemoveTags"
 #            ],
 #            "Resource": [
-#                "arn:aws:elasticloadbalancing:*:*:listener/net/*/*/*",
-#                "arn:aws:elasticloadbalancing:*:*:listener/app/*/*/*",
-#                "arn:aws:elasticloadbalancing:*:*:listener-rule/net/*/*/*",
-#                "arn:aws:elasticloadbalancing:*:*:listener-rule/app/*/*/*"
+#                "arn:${var.part}:elasticloadbalancing:*:*:listener/net/*/*/*",
+#                "arn:${var.part}:elasticloadbalancing:*:*:listener/app/*/*/*",
+#                "arn:${var.part}:elasticloadbalancing:*:*:listener-rule/net/*/*/*",
+#                "arn:${var.part}:elasticloadbalancing:*:*:listener-rule/app/*/*/*"
 #            ]
 #        },
 #        {
@@ -220,7 +220,7 @@
 #                "elasticloadbalancing:RegisterTargets",
 #                "elasticloadbalancing:DeregisterTargets"
 #            ],
-#            "Resource": "arn:aws:elasticloadbalancing:*:*:targetgroup/*/*"
+#            "Resource": "arn:${var.part}:elasticloadbalancing:*:*:targetgroup/*/*"
 #        },
 #        {
 #            "Effect": "Allow",

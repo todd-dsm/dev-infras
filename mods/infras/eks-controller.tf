@@ -95,19 +95,19 @@ resource "aws_iam_role" "apps_cluster" {
 ### Attach Policies to the above Role
 # Cluster Policy
 resource "aws_iam_role_policy_attachment" "apps_cluster-AmazonEKSClusterPolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  policy_arn = "arn:${var.part}:iam::aws:policy/AmazonEKSClusterPolicy"
   role       = aws_iam_role.apps_cluster.name
 }
 
 # Service Policy
 resource "aws_iam_role_policy_attachment" "apps_cluster-AmazonEKSServicePolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+  policy_arn = "arn:${var.part}:iam::aws:policy/AmazonEKSServicePolicy"
   role       = aws_iam_role.apps_cluster.name
 }
 
 # EKS-VPC Resource Controller
 resource "aws_iam_role_policy_attachment" "apps_cluster-AmazonEKSVPCResourceControllerPolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
+  policy_arn = "arn:${var.part}:iam::aws:policy/AmazonEKSVPCResourceController"
   role       = aws_iam_role.apps_cluster.name
 }
 
