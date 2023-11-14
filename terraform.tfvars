@@ -3,4 +3,4 @@
                       Set CONSTANTS to Populate Variables
   -----------------------------------------------------------------------------
 */
-minDistSize = 4
+#minDistSize = 4
