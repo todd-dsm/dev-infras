@@ -1,6 +1,10 @@
 /*
                               Top-Level Outputs; Good for TESTING
 */
+#output "provider_arm" {
+#  value = module.clusters.oidc_provider_arn
+#}
+
 #output "partition" {
 #  value = var.part
 #}

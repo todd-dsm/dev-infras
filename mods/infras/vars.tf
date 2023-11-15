@@ -14,6 +14,11 @@ variable "dns_zone" {
   type        = string
 }
 
+variable "dns_suffix" {
+  description = "DNS Suffix of the AWS partition; I.E.: amazonaws.com"
+  type        = string
+}
+
 variable "project" {
   description = "Project Name: should be set to something like: eks-test"
   type        = string

@@ -27,14 +27,21 @@ data "aws_partition" "found" {}
   ---------------------------------------------------------|------------------------------------------------------------
 */
 locals {
-  part    = data.aws_partition.found.partition
-  builder = regex("arn:${local.part}:iam::\\d+:user/(.*)", data.aws_caller_identity.found.arn)[0]
+  builder    = regex("arn:${local.part}:iam::\\d+:user/(.*)", data.aws_caller_identity.found.arn)[0]
+  part       = data.aws_partition.found.partition
+  dns_suffix = data.aws_partition.found.dns_suffix
+}
+
+
+
+output "iam_user" {
+  value = local.builder
 }
 
 output "partition" {
   value = local.part
 }
 
-output "iam_user" {
-  value = local.builder
+output "dns_suffix" {
+  value = local.dns_suffix
 }
